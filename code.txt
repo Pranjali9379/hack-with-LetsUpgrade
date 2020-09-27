@@ -1,0 +1,121 @@
+unsigned int dist,adc,ms=1234;
+unsigned int temp,j;
+unsigned int x0,y0,x1,y1;
+unsigned char txt1[7],txt2[7],error,latti[]="1234.1234",longi[]="1234.1234";
+unsigned char gps_data[301],flag=0;
+unsigned int adc_data1,adc_data2,i;
+
+char txt[]="1234567890ABCDEFGH";
+sfr sbit m1 at PORTB0_bit;
+sfr sbit m1_dir at DDB0_bit;
+
+
+
+
+
+
+void main()
+                 {
+                  ADC_Init();
+                  m1_dir=1;
+
+                  m1=0;
+
+                  Soft_UART_Init(&PORTD,6,7,9600,0);
+                  Uart1_Init(9600);
+                  /*  Uart1_Write_Text("AT+CWQAP\r\n");// disconnect wifi
+                     delay_ms(2000); // 2 sec delay
+                     Uart1_Write_Text("AT\r\n");// Attention
+                     delay_ms(2000); // 2 sec delay
+                     Uart1_Write_Text("AT+RST\r\n");// Reset Wifi Module
+                     delay_ms(5000); // 4 sec delay
+                     Uart1_Write_Text("AT+CWMODE?\r\n");// returns Wifi Module mode
+                     delay_ms(2000); // 2 sec delay
+                     Uart1_Write_Text("AT+CWLAP\r\n");// list all AP
+                     delay_ms(5000); // 2 sec delay
+                     Uart1_Write_Text("AT+CWJAP=");// connect to softAP
+                     Uart1_Write('"');// connect to softAP
+                     Uart1_Write_Text("ACCESSPOINT");// connect to softAP
+                     Uart1_Write('"');// connect to softAP
+                     Uart1_Write(',');// connect to softAP
+                     Uart1_Write('"');// connect to softAP
+                     Uart1_Write_Text("12345678");// connect to softAP
+                     Uart1_Write('"');// connect to softAP
+                     Uart1_Write_Text("\r\n");// Enter
+                     delay_ms(15000); // 2 sec delay
+                     Uart1_Write_Text("AT+CWJAP?\r\n");// check connectivity  to softAP
+                     delay_ms(5000); // 2 sec delay
+                     Uart1_Write_Text("AT+CIFSR\r\n");// returns IP
+                     delay_ms(5000); // 2 sec delay
+                     Uart1_Write_Text("AT+CIPMUX=1\r\n");// -ESTABLISH MULTIPLE CONNECTION
+                     delay_ms(2000); // 2 sec delay
+                     Uart1_Write_Text("AT+CIPSERVER=1,80\r\n");// -START THE SERVER
+                      */
+                      while(1)
+                           {
+
+
+                           for(i=0;i<300;i++)
+                               {
+                                while(UART1_Data_Ready()!=1);
+                                gps_data[i] =UART1_Read();
+                                }
+                               for(i=0;i<300;i++)
+                                  {
+                                   if(gps_data[i]=='$')
+                                       {
+                                       if(gps_data[i+1]=='G' && gps_data[i+2]=='P' && gps_data[i+3]=='R'                                                                       )
+
+                                           {
+                           i=i--;
+                           i=i+21;//CHNGED
+                          Uart1_Write_Text("AT+CIPSEND=0,21\r\n");
+                          //Delay_ms(2000);
+                          UART1_Write_Text("\r\nLattitude:");
+                         
+                          for(j=0;j<9;j++)
+                             {
+                              UART1_Write(gps_data[i+j]);
+                              latti[j]=gps_data[i+j];
+                              }
+                          Uart1_Write_Text("\r\n");
+                         // Delay_ms(2000);
+                          Uart1_Write_Text("AT+CIPSEND=0,21\r\n");
+                          // Delay_ms(2000);
+                          UART1_Write_Text("\r\nLongitude:");
+
+                          i=i+13;        //CHENGD
+                          for(j=0;j<9;j++)
+                             {
+                             UART1_Write(gps_data[i+j]);
+                             longi[j]=gps_data[i+j];
+                             }
+                          Uart1_Write_Text("\r\n");
+                             adc=ADC_Read(0);
+                           MS=ADC_Read(2);
+                           adc=adc/2.049;
+                           if(adc>25 || ms>512)
+                              {
+                              m1=1;
+                              Uart1_Write_Text("AT+CIPSEND=0,15\r\n");
+                              Delay_ms(2000);
+                              UART1_Write_Text("\r\n I AM IN DANGER");
+                              m1=0;
+
+
+                              }
+                          }
+
+                          }
+                          }
+
+
+
+
+
+
+//
+                           
+
+                          }
+                 }
